@@ -73,22 +73,28 @@ Lab
     ![](images/create-vault-master-key.png)
     - Crea los 2 secretos en el OCI Key Vault
     ![](images/create-vault-secret.png)
-    ```
-    OCIR_HOST_VAULT=iad.ocir.io (si esta en la region de Ashburn)
-    OCIR_STORAGE_NAMESPACE_VAULT= <Container Registry namespace>
+
+    Secreto 1: `Name: OCIR_HOST_VAULT, Valor: iad.ocir.io` (si esta en la region de Ashburn)
+    Secreto 2: `Name: OCIR_STORAGE_NAMESPACE_VAULT, Valor: <Container Registry namespace>`
     ```
 - ### Descarga el codigo de la aplicacion python y subelo al repositorio en OCI Devops
-```
-git clone https://github.com/czelabueno/python-oci-canary-oke-app.git
-cd python-oci-canary-oke-app
-git config user.email "<tu email>"
-git config user.name "<tu nombre>"
-git remote add oci-devops ssh://devops.scmservice.xxxx
-git remote
-git remote remove origin
-git pull --no-edit --allow-unrelated-histories oci-devops main
-git push oci-devops main
-```
+    - Creamos un OCI Code repo donde guardaremos el codigo de la aplicacion python (sample).
+    ![](images/oci-create-code-repository.png)
+
+    - Clona el repo publico de Github donde se encuentra publicado el sample y lo subimos al OCI Code repo que acabamos de crear.
+    ![](images/oci-code-repo-clone.png)    
+    | En el comando de abajo se debe reemplazar los 3 parametros que empieza con <..>. 
+        ```
+        git clone https://github.com/czelabueno/python-oci-canary-oke-app.git
+        cd python-oci-canary-oke-app
+        git config user.email "<tu email>"
+        git config user.name "<tu nombre>"
+        git remote add oci-devops <Tu cadena de conexion del Clone via SSH que se copio>
+        git remote
+        git remote remove origin
+        git pull --no-edit --allow-unrelated-histories oci-devops main
+        git push oci-devops main
+        ```
 - ### Asociamos los artefactos a generar en OCI DevOps
     - Artifactos en OCI DevOps . - https://docs.oracle.com/en-us/iaas/Content/devops/using/artifacts.htm
     - Crea un artefacto tipo Docker `Docker image` para subir el artefacto en el `Delivery`. Asegúrese de usar la URL de su `container repo`, con el prefijo de `${OCIR_HOST}/${OCIR_STORAGE_NAMESPACE}` y `${BUILDRUN_HASH}` al final de la URL. Esto es para hacer que la versión de la imagen de la ventana acoplable sea dinámica.
@@ -132,7 +138,7 @@ git push oci-devops main
     - Valida el acceso a OKE usando `kubectl get nodes` & `kubectl config view`.
     ![](images/kubectl-get-nodes.png)
     - Seguimos el procedimiento para instalar `Ingress Controller` - https://docs.oracle.com/en-us/iaas/Content/ContEng/Tasks/contengsettingupingresscontroller.htm
-    - Crea un `clusterrolebinding` para dar accesos en OKE a tu user oci `ocid`.
+    - Crea un `clusterrolebinding` para dar accesos en OKE a tu user oci `ocid`. Reemplaza el parametro `--user=ocid1.user.oc1..xxx` en el cmd de abajo:
     ```
     kubectl create clusterrolebinding oke_cluster_role_<username> --clusterrole=cluster-admin --user=ocid1.user.oc1..xxx
     ```
